@@ -1,7 +1,7 @@
 from django.urls import path
 
-from channelsdemo.consumers import NumberGenerator
+from channelsdemo.consumers import ApiConsumer
 
 ws_urlpatterns = [
-    path('ws/', NumberGenerator.as_asgi(), name='number-generator')
+    path('ws/', ApiConsumer.as_asgi(), name='api-consumer')
 ]

@@ -1,36 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Websocket example</title>
-</head>
+  </head>
 
-<style>
-
+  <style>
     body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #333;
     }
 
     #number {
-        font-size: 1.6rem;
-        color: white;
+      font-size: 1.6rem;
+      color: white;
     }
+  </style>
+  <body>
+    <div style="display: flex; flex-direction: column;">
+        <input id="username" placeholder="Name" style="margin-bottom: 10px;"/>
+      <button id="create" style="margin-bottom: 10px;">Create room</button>
+      <input id="code" placeholder="Code"/>
+      <button id="connect">Connect to room</button>
+    </div>
+    <script>
+        const create_button = document.getElementById("create");
+        const connect_button = document.getElementById("connect");
+        const code_input = document.getElementById('code')
+        const username_input = document.getElementById('username')
 
-</style>
-<body>
-<p id="number"></p>
-<script>
-    const socket = new WebSocket("ws://localhost:8000/ws/");
+      const socket = new WebSocket("ws://localhost:8000/ws/");
 
-    socket.onmessage = function (event) {
-        const data = JSON.parse(event.data);
-        console.log(data);
-        document.querySelector('#number').innerHTML = data.number;
-    }
-</script>
-</body>
+      socket.onmessage = function (event) {
+        const message = JSON.parse(event.data);
+        console.log(message);
+      };
+
+      connect_button.onclick = function () {
+        socket.send(
+          JSON.stringify({
+            type: "connect_to_room",
+            data: { code: code_input.value, username: username_input.value },
+          })
+        );
+      };
+
+      create_button.onclick = function () {
+        socket.send(
+          JSON.stringify({
+            type: "create_room",
+            data: {'username': username_input.value},
+          })
+        );
+      };
+    </script>
+  </body>
 </html>
