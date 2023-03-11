@@ -79,19 +79,13 @@ class ApiConsumer(WebsocketConsumer):
                 async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_ready", 'data': {'value': data['value'], 'uid': self.uid} })
 
             if typee == 'leave_room':
-                if self.playground:
-                    async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "room_destroyed", 'data': {}} )
-                else:
-                    async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_left", 'data': {'uid': self.uid} })
+                async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_left", 'data': {'uid': self.uid} })
 
                 self.remove_room_code()
                     
             if typee == 'leave_field':
                 async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_left_the_field", 'data': {'uid': self.uid} })
 
-                
-            if typee == 'destroy_room':
-                async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "room_destroyed", 'data': {}} )
 
             if typee == 'start_game':
                 order = data['order']
@@ -129,11 +123,6 @@ class ApiConsumer(WebsocketConsumer):
 
     def player_left_the_field(self, event):
         self.notify_self(event)
-            
-    def room_destroyed(self, event):
-        self.notify_self(event)
-
-        self.remove_room_code()
 
 
     def field_info(self, event):
