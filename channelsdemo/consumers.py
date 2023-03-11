@@ -97,7 +97,7 @@ class ApiConsumer(WebsocketConsumer):
                 async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_moved", 'data': {'coordinates': coordinates} })
 
             if typee == 'ready_for_move':
-                async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_ready_for_move", 'data': {'uid': self.uid} })
+                async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_ready_for_move", 'data': {'uid': data['uid']} })
         else:
             if typee != "leave_room":
                 self.send(text_data=json.dumps({'type': 'disconnected'}))
@@ -143,5 +143,5 @@ class ApiConsumer(WebsocketConsumer):
     def disconnect(self, code):        
         async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_left", 'data': {'uid': self.uid} })
         async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_left_the_field", 'data': {'uid': self.uid} })
-        
+
         self.remove_room_code()
