@@ -1,2 +1,6 @@
 prod.py
 *.pyc
+dev.py
+channelsdemo/asgi.py
+channelsdemo/wsgi.py
+manage.py
