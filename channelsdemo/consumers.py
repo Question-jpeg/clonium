@@ -135,4 +135,5 @@ class ApiConsumer(WebsocketConsumer):
         self.notify_self(event)
 
     def disconnect(self, code):
+        async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_left", 'data': {'uid': self.uid} })
         self.remove_room_code()
