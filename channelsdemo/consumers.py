@@ -42,6 +42,9 @@ class ApiConsumer(WebsocketConsumer):
         except:
             pass
 
+        if typee == 'local_message':
+            print('message received')
+
         if typee == 'create_room':
             self.remove_room_code()
 
