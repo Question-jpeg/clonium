@@ -83,7 +83,7 @@ class ApiConsumer(WebsocketConsumer):
                     async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "room_destroyed", 'data': {}} )
                 else:
                     async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_left", 'data': {'uid': self.uid} })
-                    
+
                 self.remove_room_code()
                     
             if typee == 'leave_field':
@@ -110,7 +110,7 @@ class ApiConsumer(WebsocketConsumer):
         self.notify_self(event)
 
     def get_room_info(self, event):
-        async_to_sync(self.channel_layer.group_send)(self.room_code, {'type': 'player_info', 'data': {'name': self.username, 'uid': self.uid}})
+        async_to_sync(self.channel_layer.group_send)(self.room_code, {'type': 'player_info', 'data': {'name': self.username, 'uid': self.uid, 'is_host': bool(self.playground)}})
         async_to_sync(self.channel_layer.group_send)(self.room_code, {'type': 'get_ready'})
         if self.playground:
             async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "field_info", 'data': {'playground': self.playground} })
