@@ -103,14 +103,15 @@ class ApiConsumer(WebsocketConsumer):
                 self.send(text_data=json.dumps({'type': 'disconnected'}))
         
 
+    def get_room_info(self, event):
+        if self.room_code:
+            async_to_sync(self.channel_layer.group_send)(self.room_code, {'type': 'player_info', 'data': {'name': self.username, 'uid': self.uid, 'is_host': bool(self.playground)}})
+            async_to_sync(self.channel_layer.group_send)(self.room_code, {'type': 'get_ready'})
+            if self.playground:
+                async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "field_info", 'data': {'playground': self.playground} })
+
     def message(self, event):
         self.notify_self(event)
-
-    def get_room_info(self, event):
-        async_to_sync(self.channel_layer.group_send)(self.room_code, {'type': 'player_info', 'data': {'name': self.username, 'uid': self.uid, 'is_host': bool(self.playground)}})
-        async_to_sync(self.channel_layer.group_send)(self.room_code, {'type': 'get_ready'})
-        if self.playground:
-            async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "field_info", 'data': {'playground': self.playground} })
 
     def get_ready(self, event):
         self.notify_self(event)
@@ -141,7 +142,7 @@ class ApiConsumer(WebsocketConsumer):
         self.notify_self(event)
 
     def disconnect(self, code):        
-        async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_left", 'data': {'uid': self.uid} })
-        async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_left_the_field", 'data': {'uid': self.uid} })
-
-        self.remove_room_code()
+        if self.room_code:        
+            async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_left", 'data': {'uid': self.uid} })
+            async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_left_the_field", 'data': {'uid': self.uid} })
+            self.remove_room_code()
