@@ -70,7 +70,7 @@ class ApiConsumer(WebsocketConsumer):
             if typee == 'update_field':
                 playground = data['playground']
                 self.playground = playground
-                async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "field_info", 'data': {'playground': playground} })
+                async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "field_info", 'data': data })
 
             if typee == 'get_room_info':
                 async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "get_room_info" })
@@ -94,7 +94,7 @@ class ApiConsumer(WebsocketConsumer):
 
             if typee == 'move':
                 coordinates = data['coordinates']
-                async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_moved", 'data': {'coordinates': coordinates} })
+                async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_moved", 'data': {'coordinates': coordinates, 'uid': self.uid} })
 
             if typee == 'ready_for_move':
                 async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "player_ready_for_move", 'data': {'uid': self.uid} })
