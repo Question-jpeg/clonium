@@ -105,8 +105,8 @@ class ApiConsumer(WebsocketConsumer):
     def get_room_info(self, event):
         if self.room_code:
             async_to_sync(self.channel_layer.group_send)(self.room_code, {'type': 'player_info', 'data': {'name': self.username, 'uid': self.uid, 'is_host': bool(self.field_data)}})
-            async_to_sync(self.channel_layer.group_send)(self.room_code, {'type': 'get_ready'})
             if self.field_data:
+                async_to_sync(self.channel_layer.group_send)(self.room_code, {'type': 'get_ready'})
                 async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "field_info", 'data': self.field_data })
 
     def message(self, event):
