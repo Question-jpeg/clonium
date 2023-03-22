@@ -9,7 +9,7 @@ class ApiConsumer(WebsocketConsumer):
         if self.room_code:
                 async_to_sync(self.channel_layer.group_discard)(self.room_code, self.channel_name)
         self.room_code = None
-        self.playground = None
+        self.field_data = None
 
     def notify_self(self, event):
         typee = event['type']
@@ -26,7 +26,7 @@ class ApiConsumer(WebsocketConsumer):
         self.room_code = None
         self.username = None
         self.uid = str(uuid4())
-        self.playground = None
+        self.field_data = None
 
         self.send(text_data=json.dumps({
             'type': 'connection_established',
@@ -68,8 +68,7 @@ class ApiConsumer(WebsocketConsumer):
                 async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "message", 'data': {'username': self.username, 'text': data['text']} })
 
             if typee == 'update_field':
-                playground = data['playground']
-                self.playground = playground
+                self.field_data = data
                 async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "field_info", 'data': data })
 
             if typee == 'get_room_info':
@@ -90,7 +89,7 @@ class ApiConsumer(WebsocketConsumer):
             if typee == 'start_game':
                 order = data['order']
                 names_mapping = data['names_mapping']                
-                async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "game_started", 'data': {'order': order, 'names_mapping': names_mapping, 'field': self.playground} })
+                async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "game_started", 'data': {'order': order, 'names_mapping': names_mapping, 'field_data': self.field_data} })
 
             if typee == 'move':
                 coordinates = data['coordinates']
@@ -105,10 +104,10 @@ class ApiConsumer(WebsocketConsumer):
 
     def get_room_info(self, event):
         if self.room_code:
-            async_to_sync(self.channel_layer.group_send)(self.room_code, {'type': 'player_info', 'data': {'name': self.username, 'uid': self.uid, 'is_host': bool(self.playground)}})
+            async_to_sync(self.channel_layer.group_send)(self.room_code, {'type': 'player_info', 'data': {'name': self.username, 'uid': self.uid, 'is_host': bool(self.field_data)}})
             async_to_sync(self.channel_layer.group_send)(self.room_code, {'type': 'get_ready'})
-            if self.playground:
-                async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "field_info", 'data': {'playground': self.playground} })
+            if self.field_data:
+                async_to_sync(self.channel_layer.group_send)(self.room_code, { "type": "field_info", 'data': self.field_data })
 
     def message(self, event):
         self.notify_self(event)
